@@ -22,10 +22,12 @@ class OffensiveNNModel:
                  cuda_device=-1,
                  **kwargs, ):
 
-        # if isinstance(args, dict):
-        #     self.args.update_from_dict(args)
-        # elif isinstance(args, ModelArgs):
-        #     self.args = args
+        print(args)
+
+        if isinstance(args, dict):
+            self.args.update_from_dict(args)
+        elif isinstance(args, ModelArgs):
+            self.args = args
 
         X = train_df["Text"].values
         self.embedding_model = api.load(embedding_model_name)
