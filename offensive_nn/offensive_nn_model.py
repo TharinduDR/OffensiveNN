@@ -2,6 +2,7 @@ import logging
 import gensim.downloader as api
 
 import numpy as np
+from keras_preprocessing.text import Tokenizer
 
 from offensive_nn.model_args import ModelArgs
 from offensive_nn.models.offensive_capsule_model import OffensiveCapsuleModel
@@ -14,13 +15,18 @@ logger = logging.getLogger(__name__)
 class OffensiveNNModel:
     def __init__(self, model_type,
                  embedding_model_name,
+                 train_df,
                  num_labels=None,
                  args=None,
                  use_cuda=True,
                  cuda_device=-1,
                  **kwargs, ):
 
+        X = train_df["Text"].values
         self.embedding_model = api.load(embedding_model_name)
+        self.tokenizer = Tokenizer(num_words=args.max_features, filters='')
+        self.tokenizer.fit_on_texts(list(X))
+        X = self.tokenizer.texts_to_sequences(X)
 
         MODEL_CLASSES = {
             "cnn": OffensiveCNNModel,
