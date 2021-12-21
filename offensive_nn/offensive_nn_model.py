@@ -31,7 +31,7 @@ class OffensiveNNModel:
 
         X = train_df["Text"].values
         self.embedding_model = api.load(embedding_model_name)
-        self.tokenizer = Tokenizer(num_words=args.max_features, filters='')
+        self.tokenizer = Tokenizer(num_words=self.args.max_features, filters='')
         self.tokenizer.fit_on_texts(list(X))
         X = self.tokenizer.texts_to_sequences(X)
 
