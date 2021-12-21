@@ -57,8 +57,9 @@ class OffensiveNNModel:
     #
     # def predict(self, texts):
 
+
     @staticmethod
-    def _load_model_args(self, input_dir):
+    def _load_model_args(input_dir):
         args = ModelArgs()
         args.load(input_dir)
         return args
