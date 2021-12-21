@@ -15,7 +15,6 @@ class OffensiveNNModel:
     def __init__(self, model_type,
                  embedding_model_name,
                  num_labels=None,
-                 weight=None,
                  args=None,
                  use_cuda=True,
                  cuda_device=-1,
@@ -29,12 +28,12 @@ class OffensiveNNModel:
             "capsule": OffensiveCapsuleModel
         }
 
-        self.model = MODEL_CLASSES[model_type](args, embedding_matrix)
+        # self.model = MODEL_CLASSES[model_type](args, embedding_matrix)
 
-        if isinstance(args, dict):
-            self.args.update_from_dict(args)
-        elif isinstance(args, ModelArgs):
-            self.args = args
+        # if isinstance(args, dict):
+        #     self.args.update_from_dict(args)
+        # elif isinstance(args, ModelArgs):
+        #     self.args = args
 
     # def train_model(self, train_df,
     #                 multi_label=False,
