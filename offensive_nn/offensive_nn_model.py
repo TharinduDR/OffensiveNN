@@ -22,7 +22,7 @@ class OffensiveNNModel:
                  cuda_device=-1,
                  **kwargs, ):
 
-        print(args)
+
         self.args = self._load_model_args(model_type)
 
         if isinstance(args, dict):
@@ -31,7 +31,10 @@ class OffensiveNNModel:
             self.args = args
 
         X = train_df["Text"].values
-        self.embedding_model = api.load(embedding_model_name)
+        self.embedding_model_path = api.load(embedding_model_name, return_path=True)
+
+        print(self.embedding_model_path)
+
         self.tokenizer = Tokenizer(num_words=self.args.max_features, filters='')
         self.tokenizer.fit_on_texts(list(X))
         X = self.tokenizer.texts_to_sequences(X)
