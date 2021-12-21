@@ -22,6 +22,11 @@ class OffensiveNNModel:
                  cuda_device=-1,
                  **kwargs, ):
 
+        if isinstance(args, dict):
+            self.args.update_from_dict(args)
+        elif isinstance(args, ModelArgs):
+            self.args = args
+
         X = train_df["Text"].values
         self.embedding_model = api.load(embedding_model_name)
         self.tokenizer = Tokenizer(num_words=args.max_features, filters='')
@@ -36,10 +41,7 @@ class OffensiveNNModel:
 
         # self.model = MODEL_CLASSES[model_type](args, embedding_matrix)
 
-        # if isinstance(args, dict):
-        #     self.args.update_from_dict(args)
-        # elif isinstance(args, ModelArgs):
-        #     self.args = args
+
 
     # def train_model(self, train_df,
     #                 multi_label=False,
