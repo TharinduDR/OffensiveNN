@@ -23,6 +23,7 @@ class OffensiveNNModel:
                  **kwargs, ):
 
         print(args)
+        self.args = self._load_model_args(model_type)
 
         if isinstance(args, dict):
             self.args.update_from_dict(args)
