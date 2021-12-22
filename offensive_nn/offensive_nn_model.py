@@ -22,7 +22,6 @@ class OffensiveNNModel:
                  cuda_device=-1,
                  **kwargs, ):
 
-
         self.args = self._load_model_args(model_type)
 
         if isinstance(args, dict):
@@ -49,8 +48,9 @@ class OffensiveNNModel:
             "lstm": OffensiveLSTMModel,
             "capsule": OffensiveCapsuleModel
         }
+        print(self.args)
 
-        self.model = MODEL_CLASSES[model_type](args, self.embedding_matrix)
+        self.model = MODEL_CLASSES[model_type](self.args, self.embedding_matrix)
 
 
 
@@ -109,7 +109,7 @@ class OffensiveNNModel:
                 no_embedding_count = no_embedding_count + 1
 
         no_embedding_rate = no_embedding_count/ (embedding_count + no_embedding_count)
-        logger.warning("Embeddings are not found for {:.2f} words.".format(no_embedding_rate*100))
+        logger.warning("Embeddings are not found for {:.2f}% words.".format(no_embedding_rate*100))
 
 
         return embedding_matrix
