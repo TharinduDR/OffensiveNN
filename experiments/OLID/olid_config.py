@@ -7,4 +7,6 @@ args = {
     'max_features': None,
     'max_len': 256
 
+    'num_classes': 2
+
 }

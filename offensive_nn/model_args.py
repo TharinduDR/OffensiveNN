@@ -11,6 +11,7 @@ class ModelArgs:
     max_features: int = None
     max_len: int = 256
     not_saved_args: list = field(default_factory=list)
+    num_classes: int = 2
 
     def update_from_dict(self, new_values):
         if isinstance(new_values, dict):
