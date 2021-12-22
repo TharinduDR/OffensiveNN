@@ -50,7 +50,7 @@ class OffensiveNNModel:
             "capsule": OffensiveCapsuleModel
         }
 
-        # self.model = MODEL_CLASSES[model_type](args, embedding_matrix)
+        self.model = MODEL_CLASSES[model_type](args, self.embedding_matrix)
 
 
 
@@ -101,6 +101,5 @@ class OffensiveNNModel:
             if i >= max_features: continue
             embedding_vector = embeddings_index.get(word)
             if embedding_vector is not None: embedding_matrix[i] = embedding_vector
-            if embedding_vector is None: print(word)
 
         return embedding_matrix

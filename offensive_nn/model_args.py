@@ -7,7 +7,9 @@ class ModelArgs:
     adam_epsilon: float = 1e-8
     best_model_dir: str = "outputs/best_model"
     cache_dir: str = "cache_dir/"
+    embed_size: int = 300
     max_features: int = None
+    max_len: int = 256
     not_saved_args: list = field(default_factory=list)
 
     def update_from_dict(self, new_values):
