@@ -43,6 +43,7 @@ class OffensiveNNModel:
         max_features = len(self.word_index) + 1
 
         print(self.word_index)
+        print(type(self.word_index))
 
         # self.embedding_matrix = self.get_emb_matrix(self.word_index, max_features, self.embedding_model_path)
 
@@ -83,6 +84,12 @@ class OffensiveNNModel:
     #         get_coefs(*o.rstrip().split(" ")) for o in open(embedding_file, encoding="utf8") if
     #         o.rstrip().split(" ")[0] in word_index)
     #     return embeddings_index
+
+    # @staticmethod
+    # def load_word_emb(word_index, embedding_file):
+    #     embeddings_index = {}
+    #     for word in
+
 
     def get_emb_matrix(self, word_index, max_features, embedding_file):
         embeddings_index = self.load_word_emb(word_index, embedding_file)
