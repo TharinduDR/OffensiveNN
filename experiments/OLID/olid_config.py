@@ -5,7 +5,7 @@ args = {
 
     'embed_size': 300,
     'max_features': None,
-    'max_len': 256
+    'max_len': 256,
 
     'num_classes': 2
 
