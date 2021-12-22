@@ -42,9 +42,6 @@ class OffensiveNNModel:
         self.word_index = self.tokenizer.word_index
         max_features = len(self.word_index) + 1
 
-        print(self.word_index)
-        print(type(self.word_index))
-
         self.embedding_matrix = self.get_emb_matrix(self.word_index, max_features, self.embedding_model)
 
         MODEL_CLASSES = {
@@ -88,14 +85,14 @@ class OffensiveNNModel:
     @staticmethod
     def load_word_emb(word_index, emebdding_model):
         embeddings_index = dict()
-        for idx, key in enumerate(emebdding_model.vocab):
+        for idx, key in enumerate(emebdding_model.key_to_index):
             if key in word_index:
                 embeddings_index[key] = emebdding_model[key]
         return embeddings_index
 
     def get_emb_matrix(self, word_index, max_features, embedding_file):
         embeddings_index = self.load_word_emb(word_index, embedding_file)
-        all_embs = np.stack(embeddings_index.values())
+        all_embs = np.stack(list(embeddings_index.values()))
         emb_mean, emb_std = all_embs.mean(), all_embs.std()
         embed_size = all_embs.shape[1]
 
