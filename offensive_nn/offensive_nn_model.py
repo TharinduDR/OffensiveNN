@@ -42,7 +42,9 @@ class OffensiveNNModel:
         self.word_index = self.tokenizer.word_index
         max_features = len(self.word_index) + 1
 
-        self.embedding_matrix = self.get_emb_matrix(self.word_index, max_features, self.embedding_model_path)
+        print(self.word_index)
+
+        # self.embedding_matrix = self.get_emb_matrix(self.word_index, max_features, self.embedding_model_path)
 
         MODEL_CLASSES = {
             "cnn": OffensiveCNNModel,
@@ -72,15 +74,15 @@ class OffensiveNNModel:
         args.load(input_dir)
         return args
 
-    @staticmethod
-    def load_word_emb(word_index, embedding_file):
-        def get_coefs(word, *arr):
-            return word, np.asarray(arr, dtype='float32')
-
-        embeddings_index = dict(
-            get_coefs(*o.rstrip().split(" ")) for o in open(embedding_file, encoding="utf8") if
-            o.rstrip().split(" ")[0] in word_index)
-        return embeddings_index
+    # @staticmethod
+    # def load_word_emb(word_index, embedding_file):
+    #     def get_coefs(word, *arr):
+    #         return word, np.asarray(arr, dtype='float32')
+    #
+    #     embeddings_index = dict(
+    #         get_coefs(*o.rstrip().split(" ")) for o in open(embedding_file, encoding="utf8") if
+    #         o.rstrip().split(" ")[0] in word_index)
+    #     return embeddings_index
 
     def get_emb_matrix(self, word_index, max_features, embedding_file):
         embeddings_index = self.load_word_emb(word_index, embedding_file)
