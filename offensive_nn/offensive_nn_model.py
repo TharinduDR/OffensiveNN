@@ -48,7 +48,7 @@ class OffensiveNNModel:
             "lstm": OffensiveLSTMModel,
             "capsule": OffensiveCapsuleModel
         }
-        print(self.args)
+        print(self.args.max_features)
 
         self.model = MODEL_CLASSES[model_type](self.args, self.embedding_matrix)
 
