@@ -109,7 +109,7 @@ class OffensiveNNModel:
                 no_embedding_count = no_embedding_count + 1
 
         no_embedding_rate = no_embedding_count/ (embedding_count + no_embedding_count)
-        logger.info("Embeddings are not found for {:.2f} words.".format(no_embedding_rate*100))
+        logger.warning("Embeddings are not found for {:.2f} words.".format(no_embedding_rate*100))
 
 
         return embedding_matrix
