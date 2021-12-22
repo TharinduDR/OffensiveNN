@@ -31,9 +31,9 @@ class OffensiveNNModel:
             self.args = args
 
         X = train_df["Text"].values
-        self.embedding_model_path = api.load(embedding_model_name, return_path=True)
+        self.embedding_model = api.load(embedding_model_name)
 
-        print(self.embedding_model_path)
+        # print(self.embedding_model_path)
 
         self.tokenizer = Tokenizer(num_words=self.args.max_features, filters='')
         self.tokenizer.fit_on_texts(list(X))
@@ -45,7 +45,7 @@ class OffensiveNNModel:
         print(self.word_index)
         print(type(self.word_index))
 
-        # self.embedding_matrix = self.get_emb_matrix(self.word_index, max_features, self.embedding_model_path)
+        self.embedding_matrix = self.get_emb_matrix(self.word_index, max_features, self.embedding_model)
 
         MODEL_CLASSES = {
             "cnn": OffensiveCNNModel,
@@ -85,11 +85,13 @@ class OffensiveNNModel:
     #         o.rstrip().split(" ")[0] in word_index)
     #     return embeddings_index
 
-    # @staticmethod
-    # def load_word_emb(word_index, embedding_file):
-    #     embeddings_index = {}
-    #     for word in
-
+    @staticmethod
+    def load_word_emb(word_index, emebdding_model):
+        embeddings_index = dict()
+        for idx, key in enumerate(emebdding_model.vocab):
+            if key in word_index:
+                embeddings_index[key] = emebdding_model[key]
+        return embeddings_index
 
     def get_emb_matrix(self, word_index, max_features, embedding_file):
         embeddings_index = self.load_word_emb(word_index, embedding_file)
