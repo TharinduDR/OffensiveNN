@@ -9,7 +9,7 @@ from offensive_nn.models.layers import Capsule
 
 class OffensiveCapsuleModel:
     def __init__(self, args, embedding_matrix):
-        inp = Input(shape=(args.maxlen,))
+        inp = Input(shape=(args.max_len,))
 
         x = Embedding(args.max_features, args.embed_size, weights=[embedding_matrix], trainable=False)(inp)
 

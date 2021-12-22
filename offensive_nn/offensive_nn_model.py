@@ -97,9 +97,19 @@ class OffensiveNNModel:
         embed_size = all_embs.shape[1]
 
         embedding_matrix = np.random.normal(emb_mean, emb_std, (max_features, embed_size))
+        embedding_count = 0
+        no_embedding_count = 0
         for word, i in word_index.items():
             if i >= max_features: continue
             embedding_vector = embeddings_index.get(word)
-            if embedding_vector is not None: embedding_matrix[i] = embedding_vector
+            if embedding_vector is not None:
+                embedding_matrix[i] = embedding_vector
+                embedding_count = embedding_count + 1
+            else:
+                no_embedding_count = no_embedding_count + 1
+
+        no_embedding_rate = no_embedding_count/ (embedding_count + no_embedding_count)
+        logger.info("Embeddings are not found for {:.2f} words.".format(no_embedding_rate*100))
+
 
         return embedding_matrix

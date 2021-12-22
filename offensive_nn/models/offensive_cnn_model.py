@@ -9,10 +9,10 @@ class OffensiveCNNModel:
         filter_sizes = [1, 2, 3, 5]
         num_filters = 32
 
-        inp = Input(shape=(args.maxlen,))
+        inp = Input(shape=(args.max_len,))
         x = Embedding(args.max_features, args.embed_size, weights=[embedding_matrix])(inp)
         x = SpatialDropout1D(0.4)(x)
-        x = Reshape((args.maxlen, args.embed_size, 1))(x)
+        x = Reshape((args.max_len, args.embed_size, 1))(x)
 
         conv_0 = Conv2D(num_filters, kernel_size=(filter_sizes[0], args.embed_size), kernel_initializer='normal',
                         activation='elu')(x)
@@ -23,10 +23,10 @@ class OffensiveCNNModel:
         conv_3 = Conv2D(num_filters, kernel_size=(filter_sizes[3], args.embed_size), kernel_initializer='normal',
                         activation='elu')(x)
 
-        maxpool_0 = MaxPool2D(pool_size=(args.maxlen - filter_sizes[0] + 1, 1))(conv_0)
-        maxpool_1 = MaxPool2D(pool_size=(args.maxlen - filter_sizes[1] + 1, 1))(conv_1)
-        maxpool_2 = MaxPool2D(pool_size=(args.maxlen - filter_sizes[2] + 1, 1))(conv_2)
-        maxpool_3 = MaxPool2D(pool_size=(args.maxlen - filter_sizes[3] + 1, 1))(conv_3)
+        maxpool_0 = MaxPool2D(pool_size=(args.max_len - filter_sizes[0] + 1, 1))(conv_0)
+        maxpool_1 = MaxPool2D(pool_size=(args.max_len - filter_sizes[1] + 1, 1))(conv_1)
+        maxpool_2 = MaxPool2D(pool_size=(args.max_len - filter_sizes[2] + 1, 1))(conv_2)
+        maxpool_3 = MaxPool2D(pool_size=(args.max_len - filter_sizes[3] + 1, 1))(conv_3)
 
         z = Concatenate(axis=1)([maxpool_0, maxpool_1, maxpool_2, maxpool_3])
         z = Flatten()(z)
