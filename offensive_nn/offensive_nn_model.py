@@ -9,6 +9,9 @@ from offensive_nn.models.offensive_capsule_model import OffensiveCapsuleModel
 from offensive_nn.models.offensive_cnn_model import OffensiveCNNModel
 from offensive_nn.models.offensive_lstm_model import OffensiveLSTMModel
 
+logging.basicConfig()
+logging.root.setLevel(logging.NOTSET)
+
 logger = logging.getLogger(__name__)
 
 
@@ -53,7 +56,7 @@ class OffensiveNNModel:
         self.nnmodel.model.compile(loss='binary_crossentropy',
                       optimizer='adam',
                       metrics=['accuracy'])
-        print(self.nnmodel.model.summary())
+        logger.info(self.nnmodel.model.summary())
 
 
 
