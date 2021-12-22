@@ -39,9 +39,9 @@ class OffensiveNNModel:
         X = self.tokenizer.texts_to_sequences(X)
 
         self.word_index = self.tokenizer.word_index
-        max_features = len(self.word_index) + 1
+        self.args.max_features = len(self.word_index) + 1
 
-        self.embedding_matrix = self.get_emb_matrix(self.word_index, max_features, self.embedding_model)
+        self.embedding_matrix = self.get_emb_matrix(self.word_index, self.args.max_features, self.embedding_model)
 
         MODEL_CLASSES = {
             "cnn": OffensiveCNNModel,
