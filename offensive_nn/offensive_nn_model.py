@@ -17,13 +17,15 @@ logger = logging.getLogger(__name__)
 
 class OffensiveNNModel:
     def __init__(self, model_type,
-                 embedding_model_name,
-                 train_df,
+                 embedding_model_name=None,
+                 train_df=None,
                  num_labels=None,
                  args=None,
                  use_cuda=True,
                  cuda_device=-1,
                  **kwargs, ):
+
+        self.train_df = train_df
 
         self.args = self._load_model_args(model_type)
 
@@ -32,7 +34,7 @@ class OffensiveNNModel:
         elif isinstance(args, ModelArgs):
             self.args = args
 
-        X = train_df["Text"].values
+        X = self.train_df["Text"].values
         self.embedding_model = api.load(embedding_model_name)
 
         # print(self.embedding_model_path)
@@ -68,8 +70,7 @@ class OffensiveNNModel:
     #                 eval_df=None,
     #                 verbose=True,
     #                 **kwargs):
-    #
-    # def predict(self, texts):
+
 
 
     @staticmethod
