@@ -81,7 +81,7 @@ class OffensiveNNModel:
                     verbose=True,
                     **kwargs):
 
-        checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=2, save_best_only=True, mode='min')
+        checkpoint = ModelCheckpoint(self.args.cache_dir, monitor='val_loss', verbose=2, save_best_only=True, mode='min')
         reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.6, patience=1, min_lr=0.0001, verbose=2)
         earlystopping = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=10, verbose=2, mode='auto')
         callbacks = [checkpoint, reduce_lr, earlystopping]
@@ -97,16 +97,6 @@ class OffensiveNNModel:
         args = ModelArgs()
         args.load(input_dir)
         return args
-
-    # @staticmethod
-    # def load_word_emb(word_index, embedding_file):
-    #     def get_coefs(word, *arr):
-    #         return word, np.asarray(arr, dtype='float32')
-    #
-    #     embeddings_index = dict(
-    #         get_coefs(*o.rstrip().split(" ")) for o in open(embedding_file, encoding="utf8") if
-    #         o.rstrip().split(" ")[0] in word_index)
-    #     return embeddings_index
 
     @staticmethod
     def load_word_emb(word_index, emebdding_model):
