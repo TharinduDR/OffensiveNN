@@ -1,11 +1,13 @@
 from tensorflow.python.keras import Input, Model
 from tensorflow.python.keras.layers import Embedding, Bidirectional, LSTM, Dense, Attention
+from tensorflow import keras
 
 
 class OffensiveLSTMModel:
+
     def __init__(self, args, embedding_matrix):
-        inp = Input(shape=(args.max_len,))
-        x = Embedding(args.max_features, args.embed_size, weights=[embedding_matrix], trainable=False)(inp)
+        inp = Input(shape=(None,), dtype="int64")
+        x = Embedding(args.max_features, args.embed_size, embeddings_initializer=keras.initializers.Constant(embedding_matrix), trainable=False)(inp)
         x = Bidirectional(LSTM(64, return_sequences=True))(x)
         x = Bidirectional(LSTM(64))(x)
         # x = Attention(args.max_len)(x)

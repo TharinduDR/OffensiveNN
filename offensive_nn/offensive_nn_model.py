@@ -1,9 +1,11 @@
 import logging
+import tensorflow as tf
 import gensim.downloader as api
 
 import numpy as np
-from keras_preprocessing.text import Tokenizer
+
 from tensorflow.python.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
+from tensorflow.python.keras.layers import TextVectorization
 
 from offensive_nn.model_args import ModelArgs
 from offensive_nn.models.offensive_capsule_model import OffensiveCapsuleModel
@@ -37,27 +39,19 @@ class OffensiveNNModel:
         elif isinstance(args, ModelArgs):
             self.args = args
 
-        self.train_text = self.train_df["Text"].values
-        self.eval_text = self.eval_df["Text"].values
+        self.train_texts, self.train_labels = self._prepare_data(self.train_df)
+        self.eval_texts, self.eval_labels = self._prepare_data(self.eval_df)
 
-        self.train_labels = self.train_df["Class"].values
-        self.eval_labels = self.eval_df["Class"].values
+        self.vectorizer = TextVectorization(max_tokens=None, output_sequence_length=256)
+        self.train_ds = tf.data.Dataset.from_tensor_slices(self.train_texts).batch(128)
+        self.vectorizer.adapt(self.train_ds)
 
-        self.embedding_model = api.load(embedding_model_name)
+        voc = self.vectorizer.get_vocabulary()
+        self.word_index = dict(zip(voc, range(len(voc))))
 
-        # print(self.embedding_model_path)
-
-        self.tokenizer = Tokenizer(num_words=self.args.max_features, filters='')
-        self.tokenizer.fit_on_texts(list(self.train_text))
-
-        self.train_text = self.tokenizer.texts_to_sequences(self.train_text)
-        self.eval_text = self.tokenizer.texts_to_sequences(self.eval_text)
-
-
-
-        self.word_index = self.tokenizer.word_index
         self.args.max_features = len(self.word_index) + 1
 
+        self.embedding_model = api.load(embedding_model_name)
         self.embedding_matrix = self.get_emb_matrix(self.word_index, self.args.max_features, self.embedding_model)
 
         MODEL_CLASSES = {
@@ -72,8 +66,6 @@ class OffensiveNNModel:
                       metrics=['accuracy'])
         logger.info(self.nnmodel.model.summary())
 
-
-
     def train_model(self,
                     output_dir=None,
                     show_running_loss=True,
@@ -86,19 +78,24 @@ class OffensiveNNModel:
         earlystopping = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=10, verbose=2, mode='auto')
         callbacks = [checkpoint, reduce_lr, earlystopping]
 
-        # print(self.train_text)
-        # print(self.train_labels)
+        x_train = self.vectorizer(np.array([[s] for s in self.train_texts])).numpy()
+        x_val = self.vectorizer(np.array([[s] for s in self.eval_texts])).numpy()
 
-        self.train_text = np.asarray(self.train_text, dtype=np.int64)
-        self.train_labels = np.asarray(self.train_labels, dtype=np.int64)
-        self.eval_text = np.asarray(self.eval_text, dtype=np.int64)
-        self.eval_labels = np.asarray(self.eval_labels, dtype=np.int64)
+        y_train = np.array(self.train_labels)
+        y_val = np.array(self.eval_labels)
 
-        self.nnmodel.model.fit(self.train_text, self.train_labels, batch_size=64, epochs=50, validation_data=(self.eval_text, self.eval_labels), verbose=2,
-                  callbacks=callbacks,
-                  )
+        self.nnmodel.model.fit(x_train, y_train, batch_size=64, epochs=50, validation_data=(x_val, y_val),
+                               verbose=2, callbacks=callbacks)
 
+    @staticmethod
+    def _prepare_data(data_frame):
+        texts = []
+        labels = []
+        for index, row in data_frame.iterrows():
+            texts.append(row['Text'])
+            labels.append(row['Class'])
 
+        return texts, labels
 
     @staticmethod
     def _load_model_args(input_dir):
