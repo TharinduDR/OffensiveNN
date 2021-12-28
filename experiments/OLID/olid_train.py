@@ -10,3 +10,4 @@ olid_test = pd.read_csv('experiments/OLID/olid_test.csv', sep="\t")
 
 olid_train, olid_validation = train_test_split(olid_train, test_size=0.2)
 model = OffensiveNNModel(model_type="lstm", embedding_model_name="word2vec-google-news-300", train_df=olid_train, args=args, eval_df=olid_validation)
+model.train_model()
