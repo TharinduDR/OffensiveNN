@@ -61,7 +61,7 @@ class OffensiveNNModel:
         }
 
         self.nnmodel = MODEL_CLASSES[model_type](self.args, self.embedding_matrix)
-        self.nnmodel.model.compile(loss='binary_crossentropy',
+        self.nnmodel.model.compile(loss='sparse_categorical_crossentropy',
                       optimizer='adam',
                       metrics=['accuracy'])
         logger.info(self.nnmodel.model.summary())

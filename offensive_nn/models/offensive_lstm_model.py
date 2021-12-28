@@ -13,6 +13,6 @@ class OffensiveLSTMModel:
         # x = Attention(args.max_len)(x)
         x = Dense(256, activation="relu")(x)
         # x = Dropout(0.25)(x)
-        x = Dense(args.num_classes, activation="sigmoid")(x)
+        x = Dense(args.num_classes, activation="softmax")(x)
         self.model = Model(inputs=inp, outputs=x)
         # self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
