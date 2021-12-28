@@ -19,6 +19,7 @@ class OffensiveNNModel:
     def __init__(self, model_type,
                  embedding_model_name=None,
                  train_df=None,
+                 eval_df=None,
                  num_labels=None,
                  args=None,
                  use_cuda=True,
@@ -26,6 +27,7 @@ class OffensiveNNModel:
                  **kwargs, ):
 
         self.train_df = train_df
+        self.eval_df = eval_df
 
         self.args = self._load_model_args(model_type)
 
@@ -34,14 +36,14 @@ class OffensiveNNModel:
         elif isinstance(args, ModelArgs):
             self.args = args
 
-        X = self.train_df["Text"].values
+        self.train_text = self.train_df["Text"].values
         self.embedding_model = api.load(embedding_model_name)
 
         # print(self.embedding_model_path)
 
         self.tokenizer = Tokenizer(num_words=self.args.max_features, filters='')
-        self.tokenizer.fit_on_texts(list(X))
-        X = self.tokenizer.texts_to_sequences(X)
+        self.tokenizer.fit_on_texts(list(self.train_text))
+        self.train_text = self.tokenizer.texts_to_sequences(self.train_text)
 
         self.word_index = self.tokenizer.word_index
         self.args.max_features = len(self.word_index) + 1
@@ -62,14 +64,14 @@ class OffensiveNNModel:
 
 
 
-    # def train_model(self, train_df,
-    #                 multi_label=False,
+    # def train_model(self,
     #                 output_dir=None,
     #                 show_running_loss=True,
     #                 args=None,
-    #                 eval_df=None,
     #                 verbose=True,
     #                 **kwargs):
+
+
 
 
 
