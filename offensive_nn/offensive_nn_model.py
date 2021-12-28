@@ -40,8 +40,8 @@ class OffensiveNNModel:
         self.train_text = self.train_df["Text"].values
         self.eval_text = self.eval_df["Text"].values
 
-        self.train_labels = self.train_df["label"].values
-        self.eval_labels = self.eval_df["label"].values
+        self.train_labels = self.train_df["Class"].values
+        self.eval_labels = self.eval_df["Class"].values
 
         self.embedding_model = api.load(embedding_model_name)
 
