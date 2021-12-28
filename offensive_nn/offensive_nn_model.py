@@ -86,6 +86,11 @@ class OffensiveNNModel:
         earlystopping = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=10, verbose=2, mode='auto')
         callbacks = [checkpoint, reduce_lr, earlystopping]
 
+        self.train_text = np.asarray(self.train_text)
+        self.train_labels = np.asarray(self.train_labels)
+        self.eval_text = np.asarray(self.eval_text)
+        self.eval_labels = np.asarray(self.eval_labels)
+
         self.nnmodel.model.fit(self.train_text, self.train_labels, batch_size=64, epochs=50, validation_data=(self.eval_text, self.eval_labels), verbose=2,
                   callbacks=callbacks,
                   )
