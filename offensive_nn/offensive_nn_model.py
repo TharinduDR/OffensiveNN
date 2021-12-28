@@ -74,8 +74,8 @@ class OffensiveNNModel:
                     **kwargs):
 
         checkpoint = ModelCheckpoint(self.args.cache_dir, monitor='val_loss', verbose=2, save_best_only=True, mode='min')
-        reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.6, patience=1, min_lr=0.0001, verbose=2)
-        earlystopping = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=10, verbose=2, mode='auto')
+        reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.6, patience=1, min_lr=0.0001, verbose=1)
+        earlystopping = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=10, verbose=1, mode='auto')
         callbacks = [checkpoint, reduce_lr, earlystopping]
 
         x_train = self.vectorizer(np.array([[s] for s in self.train_texts])).numpy()
@@ -85,7 +85,7 @@ class OffensiveNNModel:
         y_val = np.array(self.eval_labels)
 
         self.nnmodel.model.fit(x_train, y_train, batch_size=64, epochs=50, validation_data=(x_val, y_val),
-                               verbose=2, callbacks=callbacks)
+                               verbose=1, callbacks=callbacks)
 
     @staticmethod
     def _prepare_data(data_frame):
