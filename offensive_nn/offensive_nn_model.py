@@ -3,6 +3,7 @@ import gensim.downloader as api
 
 import numpy as np
 from keras_preprocessing.text import Tokenizer
+from tensorflow.python.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 
 from offensive_nn.model_args import ModelArgs
 from offensive_nn.models.offensive_capsule_model import OffensiveCapsuleModel
@@ -10,7 +11,7 @@ from offensive_nn.models.offensive_cnn_model import OffensiveCNNModel
 from offensive_nn.models.offensive_lstm_model import OffensiveLSTMModel
 
 logging.basicConfig()
-logging.root.setLevel(logging.NOTSET)
+logging.root.setLevel(logging.INFO)
 
 logger = logging.getLogger(__name__)
 
@@ -37,13 +38,22 @@ class OffensiveNNModel:
             self.args = args
 
         self.train_text = self.train_df["Text"].values
+        self.eval_text = self.eval_df["Text"].values
+
+        self.train_labels = self.train_df["label"].values
+        self.eval_labels = self.eval_df["label"].values
+
         self.embedding_model = api.load(embedding_model_name)
 
         # print(self.embedding_model_path)
 
         self.tokenizer = Tokenizer(num_words=self.args.max_features, filters='')
         self.tokenizer.fit_on_texts(list(self.train_text))
+
         self.train_text = self.tokenizer.texts_to_sequences(self.train_text)
+        self.eval_text = self.tokenizer.texts_to_sequences(self.eval_text)
+
+
 
         self.word_index = self.tokenizer.word_index
         self.args.max_features = len(self.word_index) + 1
@@ -64,14 +74,21 @@ class OffensiveNNModel:
 
 
 
-    # def train_model(self,
-    #                 output_dir=None,
-    #                 show_running_loss=True,
-    #                 args=None,
-    #                 verbose=True,
-    #                 **kwargs):
+    def train_model(self,
+                    output_dir=None,
+                    show_running_loss=True,
+                    args=None,
+                    verbose=True,
+                    **kwargs):
 
+        checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=2, save_best_only=True, mode='min')
+        reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.6, patience=1, min_lr=0.0001, verbose=2)
+        earlystopping = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=10, verbose=2, mode='auto')
+        callbacks = [checkpoint, reduce_lr, earlystopping]
 
+        self.nnmodel.model.fit(self.train_text, self.train_labels, batch_size=64, epochs=50, validation_data=(self.eval_text, self.eval_labels), verbose=2,
+                  callbacks=callbacks,
+                  )
 
 
 
