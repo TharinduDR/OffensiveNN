@@ -12,7 +12,7 @@ class OffensiveCNNModel:
                              embeddings_initializer=keras.initializers.Constant(embedding_matrix), trainable=False,
                              name="embedding_layer")(inp)
         x = layers.SpatialDropout1D(0.4)(x)
-        x = layers.Reshape((args.max_len, args.embed_size, 1))(x)
+        # x = layers.Reshape((args.max_len, args.embed_size, 1))(x)
 
         conv_0 = layers.Conv2D(num_filters, kernel_size=(filter_sizes[0], args.embed_size), kernel_initializer='normal',
                         activation='elu')(x)
