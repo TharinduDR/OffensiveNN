@@ -7,7 +7,7 @@ args = {
     "early_stopping_min_delta" : 0.0001,
     "early_stopping_patience": 10,
 
-    'embed_size': 200,
+    'embed_size': 300,
 
     'learning_rate': 1e-3,
     'max_features': None,
