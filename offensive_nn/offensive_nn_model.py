@@ -2,7 +2,9 @@ import logging
 import tensorflow as tf
 import gensim.downloader as api
 
+
 import numpy as np
+from tensorflow.python.keras import Input
 
 from tensorflow.python.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 from tensorflow.python.keras.layers import TextVectorization
@@ -86,6 +88,24 @@ class OffensiveNNModel:
 
         self.nnmodel.model.fit(x_train, y_train, batch_size=64, epochs=50, validation_data=(x_val, y_val),
                                verbose=1, callbacks=callbacks)
+
+        self.save_model()
+
+    def save_model(self):
+        inputs = tf.keras.Input(shape=(1,), dtype="string")
+        # Turn strings into vocab indices
+        indices = self.vectorizer(inputs)
+        # Turn vocab indices into predictions
+        outputs = self.nnmodel.model(indices)
+
+        end_to_end_model = tf.keras.Model(inputs, outputs)
+        end_to_end_model.compile(
+            loss='sparse_categorical_crossentropy',
+            optimizer='adam',
+            metrics=['accuracy']
+        )
+        end_to_end_model.save(self.args.best_model_dir)
+
 
     @staticmethod
     def _prepare_data(data_frame):
