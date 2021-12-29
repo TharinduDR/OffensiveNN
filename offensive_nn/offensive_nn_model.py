@@ -4,10 +4,10 @@ import gensim.downloader as api
 
 
 import numpy as np
-from tensorflow.python.keras import Input
+import os
 
 from tensorflow.python.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
-from tensorflow.python.keras.layers import TextVectorization
+
 
 from offensive_nn.model_args import ModelArgs
 from offensive_nn.models.offensive_capsule_model import OffensiveCapsuleModel
@@ -44,7 +44,7 @@ class OffensiveNNModel:
         self.train_texts, self.train_labels = self._prepare_data(self.train_df)
         self.eval_texts, self.eval_labels = self._prepare_data(self.eval_df)
 
-        self.vectorizer = TextVectorization(max_tokens=None, output_sequence_length=256)
+        self.vectorizer = tf.keras.layers.TextVectorization(max_tokens=None, output_sequence_length=256)
         self.train_ds = tf.data.Dataset.from_tensor_slices(self.train_texts).batch(128)
         self.vectorizer.adapt(self.train_ds)
 
@@ -92,6 +92,8 @@ class OffensiveNNModel:
         self.save_model()
 
     def save_model(self):
+        os.makedirs(self.args.best_model_dir, exist_ok=True)
+
         inputs = tf.keras.Input(shape=(1,), dtype="string")
         # Turn strings into vocab indices
         indices = self.vectorizer(inputs)
@@ -106,7 +108,6 @@ class OffensiveNNModel:
         )
         end_to_end_model.save(self.args.best_model_dir)
 
-
     @staticmethod
     def _prepare_data(data_frame):
         texts = []
@@ -116,6 +117,10 @@ class OffensiveNNModel:
             labels.append(row['Class'])
 
         return texts, labels
+
+    def save_model_args(self, output_dir):
+        os.makedirs(output_dir, exist_ok=True)
+        self.args.save(output_dir)
 
     @staticmethod
     def _load_model_args(input_dir):
