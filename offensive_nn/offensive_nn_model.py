@@ -32,7 +32,7 @@ class OffensiveNNModel:
                  args=None):
 
         if os.path.isdir(model_type_or_path):
-            self.nnmodel.model = keras.models.load_model('path/to/location')
+            self.nnmodel.model = keras.models.load_model(model_type_or_path)
             self.args = self._load_model_args(model_type_or_path)
 
         else:
