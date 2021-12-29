@@ -32,7 +32,7 @@ class OffensiveNNModel:
                  args=None):
 
         if os.path.isdir(model_type_or_path):
-            self.nnmodel.model = keras.models.load_model(model_type_or_path)
+            self.model = keras.models.load_model(model_type_or_path)
             self.args = self._load_model_args(model_type_or_path)
 
         else:
@@ -67,12 +67,12 @@ class OffensiveNNModel:
                 "capsule": OffensiveCapsuleModel
             }
 
-            self.nnmodel = MODEL_CLASSES[model_type_or_path](self.args, self.embedding_matrix)
+            self.model = MODEL_CLASSES[model_type_or_path](self.args, self.embedding_matrix).model
 
             opt = keras.optimizers.Adam(learning_rate=self.args.learning_rate)
-            self.nnmodel.model.compile(loss='sparse_categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
+            self.model.compile(loss='sparse_categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
-        logger.info(self.nnmodel.model.summary())
+        logger.info(self.model.summary())
 
     def train_model(self,
                     args=None,
@@ -103,14 +103,14 @@ class OffensiveNNModel:
         y_train = np.array(self.train_labels)
         y_val = np.array(self.eval_labels)
 
-        self.nnmodel.model.fit(x_train, y_train, batch_size=self.args.train_batch_size,
+        self.model.fit(x_train, y_train, batch_size=self.args.train_batch_size,
                                epochs=self.args.num_train_epochs, validation_data=(x_val, y_val),
                                verbose=verbose, callbacks=callbacks)
 
         self.save_model()
 
     def predict(self, texts):
-        predictions = self.nnmodel.model.predict(texts, batch_size=self.args.test_batch_size)
+        predictions = self.model.predict(texts, batch_size=self.args.test_batch_size)
         return np.argmax(predictions, axis=1).tolist(), predictions.tolist()
 
     def save_model(self):
@@ -120,7 +120,7 @@ class OffensiveNNModel:
         # Turn strings into vocab indices
         indices = self.vectorizer(inputs)
         # Turn vocab indices into predictions
-        outputs = self.nnmodel.model(indices)
+        outputs = self.model(indices)
 
         end_to_end_model = tf.keras.Model(inputs, outputs)
         end_to_end_model.compile(
