@@ -1,8 +1,9 @@
 import json
 import os
-from dataclasses import asdict, field
+from dataclasses import asdict, field, dataclass
 
 
+@dataclass
 class ModelArgs:
 
     best_model_dir: str = "outputs/best_model"
