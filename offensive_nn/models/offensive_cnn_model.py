@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras import layers
-
+from tensorflow import keras
 
 class OffensiveCNNModel:
     def __init__(self, args, embedding_matrix=None):
