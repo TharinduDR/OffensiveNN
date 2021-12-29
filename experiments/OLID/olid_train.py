@@ -31,7 +31,8 @@ final_predictions = []
 for row in test_preds:
     row = row.tolist()
     final_predictions.append(int(max(set(row), key=row.count)))
-    olid_test['predictions'] = final_predictions
+
+olid_test['predictions'] = final_predictions
 
 olid_test['predictions'] = decode(olid_test['predictions'])
 print_information(olid_test, "predictions", "Class")
