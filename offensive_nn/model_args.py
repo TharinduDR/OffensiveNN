@@ -16,6 +16,8 @@ class ModelArgs:
 
     learning_rate: float = 1e-3
 
+    manual_seed: int = None
+
     max_features: int = None
     max_len: int = 256
 

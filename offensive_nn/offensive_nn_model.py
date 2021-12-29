@@ -1,4 +1,6 @@
 import logging
+import random
+
 import tensorflow as tf
 import gensim.downloader as api
 from tensorflow import keras
@@ -45,6 +47,11 @@ class OffensiveNNModel:
                 self.args.update_from_dict(args)
             elif isinstance(args, ModelArgs):
                 self.args = args
+
+            if self.args.manual_seed:
+                random.seed(self.args.manual_seed)
+                np.random.seed(self.args.manual_seed)
+                tf.random.set_seed(self.args.manual_seed)
 
             self.train_texts, self.train_labels = self._prepare_data(self.train_df)
             self.eval_texts, self.eval_labels = self._prepare_data(self.eval_df)

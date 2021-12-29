@@ -13,6 +13,10 @@ args = {
     'max_features': None,
     'max_len': 256,
 
+    'manual_seed': 777,
+
+    'n_fold': 3,
+
     'num_classes': 2,
     'num_train_epochs': 50,
 
