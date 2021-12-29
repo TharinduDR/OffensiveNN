@@ -5,6 +5,7 @@ import gensim.downloader as api
 
 import numpy as np
 import os
+import absl.logging
 
 from tensorflow.python.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 
@@ -16,6 +17,9 @@ from offensive_nn.models.offensive_lstm_model import OffensiveLSTMModel
 
 logging.basicConfig()
 logging.root.setLevel(logging.INFO)
+
+
+absl.logging.set_verbosity(absl.logging.ERROR)
 
 logger = logging.getLogger(__name__)
 
