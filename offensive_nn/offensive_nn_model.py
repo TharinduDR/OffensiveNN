@@ -13,7 +13,6 @@ from tensorflow.python.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
 
 from offensive_nn.model_args import ModelArgs
-from offensive_nn.models.offensive_capsule_model import OffensiveCapsuleModel
 from offensive_nn.models.offensive_cnn_model import OffensiveCNNModel
 from offensive_nn.models.offensive_lstm_model import OffensiveLSTMModel
 
@@ -70,8 +69,7 @@ class OffensiveNNModel:
 
             MODEL_CLASSES = {
                 "cnn": OffensiveCNNModel,
-                "lstm": OffensiveLSTMModel,
-                "capsule": OffensiveCapsuleModel
+                "lstm": OffensiveLSTMModel
             }
 
             self.model = MODEL_CLASSES[model_type_or_path](self.args, self.embedding_matrix).model
