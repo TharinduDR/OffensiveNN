@@ -4,14 +4,35 @@ from dataclasses import asdict, field
 
 
 class ModelArgs:
-    adam_epsilon: float = 1e-8
+
     best_model_dir: str = "outputs/best_model"
     cache_dir: str = "cache_dir/"
     embed_size: int = 300
+
+    early_stopping: bool = True
+    early_stopping_min_delta: float = 0.0001
+    early_stopping_patience: int = 10
+
+    learning_rate: float = 1e-3
+
     max_features: int = None
     max_len: int = 256
+
     not_saved_args: list = field(default_factory=list)
     num_classes: int = 2
+    num_train_epochs: int = 50
+
+    reduce_lr_on_plateau: bool = True
+    reduce_lr_on_plateau_factor: float = 0.6
+    reduce_lr_on_plateau_patience: int = 2,
+    reduce_lr_on_plateau_min_lr: float = 0.0001
+
+
+
+    save_best_model: bool = True
+
+    test_batch_size: int = 128
+    train_batch_size: int = 128
 
     def update_from_dict(self, new_values):
         if isinstance(new_values, dict):

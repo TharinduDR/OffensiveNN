@@ -1,7 +1,7 @@
 import logging
 import tensorflow as tf
 import gensim.downloader as api
-
+from tensorflow import keras
 
 import numpy as np
 import os
@@ -25,64 +25,77 @@ logger = logging.getLogger(__name__)
 
 
 class OffensiveNNModel:
-    def __init__(self, model_type,
+    def __init__(self, model_type_or_path,
                  embedding_model_name=None,
                  train_df=None,
                  eval_df=None,
-                 num_labels=None,
-                 args=None,
-                 use_cuda=True,
-                 cuda_device=-1,
-                 **kwargs, ):
+                 args=None):
 
-        self.train_df = train_df
-        self.eval_df = eval_df
+        if os.path.isdir(model_type_or_path):
+            self.nnmodel.model = keras.models.load_model('path/to/location')
+            self.args = self._load_model_args(model_type_or_path)
 
-        self.args = self._load_model_args(model_type)
+        else:
+            self.train_df = train_df
+            self.eval_df = eval_df
 
-        if isinstance(args, dict):
-            self.args.update_from_dict(args)
-        elif isinstance(args, ModelArgs):
-            self.args = args
+            self.args = self._load_model_args(model_type_or_path)
 
-        self.train_texts, self.train_labels = self._prepare_data(self.train_df)
-        self.eval_texts, self.eval_labels = self._prepare_data(self.eval_df)
+            if isinstance(args, dict):
+                self.args.update_from_dict(args)
+            elif isinstance(args, ModelArgs):
+                self.args = args
 
-        self.vectorizer = tf.keras.layers.TextVectorization(max_tokens=None, output_sequence_length=256)
-        self.train_ds = tf.data.Dataset.from_tensor_slices(self.train_texts).batch(128)
-        self.vectorizer.adapt(self.train_ds)
+            self.train_texts, self.train_labels = self._prepare_data(self.train_df)
+            self.eval_texts, self.eval_labels = self._prepare_data(self.eval_df)
 
-        voc = self.vectorizer.get_vocabulary()
-        self.word_index = dict(zip(voc, range(len(voc))))
+            self.vectorizer = tf.keras.layers.TextVectorization(max_tokens=self.args.max_features, output_sequence_length=self.args.max_len)
+            self.train_ds = tf.data.Dataset.from_tensor_slices(self.train_texts).batch(self.args.train_batch_size)
+            self.vectorizer.adapt(self.train_ds)
 
-        self.args.max_features = len(self.word_index) + 1
+            voc = self.vectorizer.get_vocabulary()
+            self.word_index = dict(zip(voc, range(len(voc))))
 
-        self.embedding_model = api.load(embedding_model_name)
-        self.embedding_matrix = self.get_emb_matrix(self.word_index, self.args.max_features, self.embedding_model)
+            self.args.max_features = len(self.word_index) + 1
 
-        MODEL_CLASSES = {
-            "cnn": OffensiveCNNModel,
-            "lstm": OffensiveLSTMModel,
-            "capsule": OffensiveCapsuleModel
-        }
+            self.embedding_model = api.load(embedding_model_name)
+            self.embedding_matrix = self.get_emb_matrix(self.word_index, self.args.max_features, self.embedding_model)
 
-        self.nnmodel = MODEL_CLASSES[model_type](self.args, self.embedding_matrix)
-        self.nnmodel.model.compile(loss='sparse_categorical_crossentropy',
-                      optimizer='adam',
-                      metrics=['accuracy'])
+            MODEL_CLASSES = {
+                "cnn": OffensiveCNNModel,
+                "lstm": OffensiveLSTMModel,
+                "capsule": OffensiveCapsuleModel
+            }
+
+            self.nnmodel = MODEL_CLASSES[model_type_or_path](self.args, self.embedding_matrix)
+
+            opt = keras.optimizers.Adam(learning_rate=self.args.learning_rate)
+            self.nnmodel.model.compile(loss='sparse_categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
+
         logger.info(self.nnmodel.model.summary())
 
     def train_model(self,
-                    output_dir=None,
-                    show_running_loss=True,
                     args=None,
-                    verbose=True,
-                    **kwargs):
+                    verbose=1):
 
-        checkpoint = ModelCheckpoint(self.args.cache_dir, monitor='val_loss', verbose=2, save_best_only=True, mode='min')
-        reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.6, patience=1, min_lr=0.0001, verbose=1)
-        earlystopping = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=10, verbose=1, mode='auto')
-        callbacks = [checkpoint, reduce_lr, earlystopping]
+        if args:
+            self.args.update_from_dict(args)
+        callbacks = []
+
+        if self.args.save_best_model:
+            checkpoint = ModelCheckpoint(self.args.cache_dir, monitor='val_loss', verbose=verbose, save_best_only=True, mode='min')
+            callbacks.append(checkpoint)
+
+        if self.args.reduce_lr_on_plateau:
+            reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=self.args.reduce_lr_on_plateau_factor,
+                                          patience=self.args.reduce_lr_on_plateau_patience,
+                                          min_lr=self.args.reduce_lr_on_plateau_min_lr, verbose=1)
+            callbacks.append(reduce_lr)
+
+        if self.args.early_stopping:
+            earlystopping = EarlyStopping(monitor='val_loss', min_delta=self.args.early_stopping_min_delta,
+                                          patience=self.args.early_stopping_patience, verbose=verbose, mode='auto')
+            callbacks.append(earlystopping)
 
         x_train = self.vectorizer(np.array([[s] for s in self.train_texts])).numpy()
         x_val = self.vectorizer(np.array([[s] for s in self.eval_texts])).numpy()
@@ -90,10 +103,15 @@ class OffensiveNNModel:
         y_train = np.array(self.train_labels)
         y_val = np.array(self.eval_labels)
 
-        self.nnmodel.model.fit(x_train, y_train, batch_size=64, epochs=50, validation_data=(x_val, y_val),
-                               verbose=1, callbacks=callbacks)
+        self.nnmodel.model.fit(x_train, y_train, batch_size=self.args.train_batch_size,
+                               epochs=self.args.num_train_epochs, validation_data=(x_val, y_val),
+                               verbose=verbose, callbacks=callbacks)
 
         self.save_model()
+
+    def predict(self, texts):
+        predictions = self.nnmodel.model.predict(texts)
+        return np.argmax(predictions, axis=1).tolist(), predictions.tolist()
 
     def save_model(self):
         os.makedirs(self.args.best_model_dir, exist_ok=True)
@@ -111,6 +129,7 @@ class OffensiveNNModel:
             metrics=['accuracy']
         )
         end_to_end_model.save(self.args.best_model_dir)
+        self.save_model_args(self.args.best_model_dir)
 
     @staticmethod
     def _prepare_data(data_frame):
@@ -160,6 +179,5 @@ class OffensiveNNModel:
 
         no_embedding_rate = no_embedding_count/ (embedding_count + no_embedding_count)
         logger.warning("Embeddings are not found for {:.2f}% words.".format(no_embedding_rate*100))
-
 
         return embedding_matrix
