@@ -110,7 +110,7 @@ class OffensiveNNModel:
         self.save_model()
 
     def predict(self, texts):
-        predictions = self.nnmodel.model.predict(texts)
+        predictions = self.nnmodel.model.predict(texts, batch_size=self.args.test_batch_size)
         return np.argmax(predictions, axis=1).tolist(), predictions.tolist()
 
     def save_model(self):
