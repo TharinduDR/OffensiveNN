@@ -18,7 +18,7 @@ test_preds = np.zeros((len(olid_test), args["n_fold"]))
 
 for i in range(args["n_fold"]):
     olid_train, olid_validation = train_test_split(olid_train, test_size=0.2, random_state=args["manual_seed"])
-    model = OffensiveNNModel(model_type_or_path="cnn1D", embedding_model_name="word2vec-google-news-300", train_df=olid_train, args=args, eval_df=olid_validation)
+    model = OffensiveNNModel(model_type_or_path="cnn2D", embedding_model_name="word2vec-google-news-300", train_df=olid_train, args=args, eval_df=olid_validation)
     model.train_model()
     print("Finished Training")
     model = OffensiveNNModel(model_type_or_path=args["best_model_dir"])
