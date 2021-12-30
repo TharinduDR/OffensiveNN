@@ -28,7 +28,7 @@ class OffensiveCNNModel:
         maxpool_2 = layers.MaxPool2D(pool_size=(args.max_len - filter_sizes[2] + 1, 1), name="pool2_layer")(conv_2)
         maxpool_3 = layers.MaxPool2D(pool_size=(args.max_len - filter_sizes[3] + 1, 1), name="pool3_layer")(conv_3)
 
-        z = layers.Concatenate(axis=1)([maxpool_0, maxpool_1, maxpool_2, maxpool_3], name="conc_layer")
+        z = layers.Concatenate(axis=1, name="conc_layer")([maxpool_0, maxpool_1, maxpool_2, maxpool_3])
         z = layers.Flatten(name="flatten_layer")(z)
         z = layers.Dropout(0.1, name="dropout_layer")(z)
         outp = layers.Dense(args.num_classes, activation="softmax", name="dense_predictions")(z)
