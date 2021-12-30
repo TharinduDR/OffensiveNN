@@ -11,8 +11,11 @@ import numpy as np
 olid_train = pd.read_csv('experiments/OLID/olid_train.csv', sep="\t")
 olid_test = pd.read_csv('experiments/OLID/olid_test.csv', sep="\t")
 
-olid_train['Class'] = encode(olid_train["Class"])
-test_sentences = olid_test['Text'].tolist()
+olid_train = olid_train.rename(columns={'Text': 'text', 'Class': 'labels'})
+olid_test = olid_test.rename(columns={'Text': 'text', 'Class': 'labels'})
+
+olid_train['labels'] = encode(olid_train["labels"])
+test_sentences = olid_test['text'].tolist()
 
 test_preds = np.zeros((len(olid_test), args["n_fold"]))
 
@@ -35,4 +38,4 @@ for row in test_preds:
 olid_test['predictions'] = final_predictions
 
 olid_test['predictions'] = decode(olid_test['predictions'])
-print_information(olid_test, "predictions", "Class")
+print_information(olid_test, "predictions", "labels")

@@ -148,8 +148,8 @@ class OffensiveNNModel:
         texts = []
         labels = []
         for index, row in data_frame.iterrows():
-            texts.append(row['Text'])
-            labels.append(row['Class'])
+            texts.append(row['text'])
+            labels.append(row['labels'])
 
         return texts, labels
 
