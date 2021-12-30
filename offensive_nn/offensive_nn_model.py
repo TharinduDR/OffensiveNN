@@ -1,5 +1,6 @@
 import logging
 import random
+import shutil
 
 import tensorflow as tf
 import gensim.downloader as api
@@ -13,7 +14,7 @@ from tensorflow.python.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
 
 from offensive_nn.model_args import ModelArgs
-from offensive_nn.models.offensive_cnn_model import OffensiveCNNModel
+from offensive_nn.models.offensive_cnn_model import OffensiveCNN2DModel
 from offensive_nn.models.offensive_lstm_model import OffensiveLSTMModel
 
 logging.basicConfig()
@@ -68,7 +69,7 @@ class OffensiveNNModel:
             self.embedding_matrix = self.get_emb_matrix(self.word_index, self.args.max_features, self.embedding_model)
 
             MODEL_CLASSES = {
-                "cnn": OffensiveCNNModel,
+                "cnn2D": OffensiveCNN2DModel,
                 "lstm": OffensiveLSTMModel
             }
 
@@ -82,6 +83,9 @@ class OffensiveNNModel:
     def train_model(self,
                     args=None,
                     verbose=1):
+
+        shutil.rmtree(self.args.cache_dir)
+        shutil.rmtree(self.args.best_model_dir)
 
         if args:
             self.args.update_from_dict(args)

@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow import keras
 
-class OffensiveCNNModel:
+class OffensiveCNN2DModel:
     def __init__(self, args, embedding_matrix=None):
         filter_sizes = [1, 2, 3, 5]
         num_filters = 32
