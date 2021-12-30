@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="offensivenn",
-    version="0.0.1",
+    version="0.0.2",
     author="Tharindu Ranasinghe",
     author_email="rhtdranasinghe@gmail.com",
     description="Offensive Language Identification with Neural Networks",
@@ -21,9 +21,9 @@ setup(
     ],
     python_requires=">=3.6",
     install_requires=[
-        "pandas"
-        "numpy"
-        "gensim"
+        "pandas",
+        "numpy",
+        "gensim",
         "sklearn"
     ],
 )
