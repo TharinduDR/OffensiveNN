@@ -18,5 +18,5 @@ class OffensiveCNN1DModel:
         x = layers.GlobalMaxPooling1D()(x)
         x = layers.Dense(128, activation="relu")(x)
         x = layers.Dropout(0.5)(x)
-        preds = layers.Dense(args.num_classes, activation="softmax", name="dense_predictions")(z)
+        preds = layers.Dense(args.num_classes, activation="softmax", name="dense_predictions")(x)
         self.model = keras.Model(int_sequences_input, preds, name="cnn1D_model")
