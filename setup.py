@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="offensivenn",
-    version="0.0.4",
+    version="0.0.5",
     author="Tharindu Ranasinghe",
     author_email="rhtdranasinghe@gmail.com",
     description="Offensive Language Identification with Neural Networks",

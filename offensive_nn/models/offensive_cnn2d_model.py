@@ -7,10 +7,11 @@ class OffensiveCNN2DModel:
         filter_sizes = [1, 2, 3, 5]
         num_filters = 32
 
+        emb = layers.Embedding(args.max_features, args.embed_size, trainable=False,
+                               name="embedding_layer")
+
         inp = tf.keras.Input(shape=(None,), dtype="int64", name="input")
-        x = layers.Embedding(args.max_features, args.embed_size,
-                             embeddings_initializer=keras.initializers.Constant(embedding_matrix), trainable=False,
-                             name="embedding_layer")(inp)
+        x = emb(inp)
         x = layers.SpatialDropout1D(0.4, name="spatial_dropout_layer")(x)
         x = layers.Reshape((args.max_len, args.embed_size, 1), name="reshape_layer")(x)
 
@@ -32,4 +33,5 @@ class OffensiveCNN2DModel:
         z = layers.Flatten(name="flatten_layer")(z)
         z = layers.Dropout(0.1, name="dropout_layer")(z)
         outp = layers.Dense(args.num_classes, activation="softmax", name="dense_predictions")(z)
+        emb.set_weights([embedding_matrix])
         self.model = tf.keras.Model(inputs=inp, outputs=outp, name="cnn_model")
