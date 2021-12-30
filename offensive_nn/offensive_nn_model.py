@@ -118,6 +118,7 @@ class OffensiveNNModel:
                                epochs=self.args.num_train_epochs, validation_data=(x_val, y_val),
                                verbose=verbose, callbacks=callbacks)
 
+        self.model = keras.models.load_model(self.args.cache_dir)
         self.save_model()
 
     def predict(self, texts):
