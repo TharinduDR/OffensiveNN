@@ -14,7 +14,8 @@ from tensorflow.python.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
 
 from offensive_nn.model_args import ModelArgs
-from offensive_nn.models.offensive_cnn_model import OffensiveCNN2DModel
+from offensive_nn.models.offensive_cnn1d_model import OffensiveCNN1DModel
+from offensive_nn.models.offensive_cnn2d_model import OffensiveCNN2DModel
 from offensive_nn.models.offensive_lstm_model import OffensiveLSTMModel
 
 logging.basicConfig()
@@ -69,6 +70,7 @@ class OffensiveNNModel:
             self.embedding_matrix = self.get_emb_matrix(self.word_index, self.args.max_features, self.embedding_model)
 
             MODEL_CLASSES = {
+                "cnn1D": OffensiveCNN1DModel,
                 "cnn2D": OffensiveCNN2DModel,
                 "lstm": OffensiveLSTMModel
             }
