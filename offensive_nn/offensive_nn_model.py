@@ -85,9 +85,11 @@ class OffensiveNNModel:
     def train_model(self,
                     args=None,
                     verbose=1):
+        if os.path.exists(self.args.cache_dir) and os.path.isdir(self.args.cache_dir):
+            shutil.rmtree(self.args.cache_dir)
 
-        shutil.rmtree(self.args.cache_dir)
-        shutil.rmtree(self.args.best_model_dir)
+        if os.path.exists(self.args.best_model_dir) and os.path.isdir(self.args.best_model_dir):
+            shutil.rmtree(self.args.best_model_dir)
 
         if args:
             self.args.update_from_dict(args)
