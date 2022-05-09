@@ -1,4 +1,6 @@
 args = {
+    'embedding_model': 'word2vec-google-news-300',
+
     'output_dir': 'temp_olid/outputs/',
     "best_model_dir": "temp_olid/outputs/best_model",
     'cache_dir': 'temp_olid/cache_dir/',
